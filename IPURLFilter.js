@@ -1,6 +1,6 @@
-function readTextFile(f, callback) {
+function readTextFile(file, callback) {
   let reader = new FileReader();
-  reader.readAsText(f);
+  reader.readAsText(file);
   reader.onload = function() {
     callback(reader.result);
   };
@@ -9,36 +9,20 @@ function readTextFile(f, callback) {
 window.onload = function() {
   let input = document.getElementById('input');
   
-  input.onchange = function(e) {
-    let files = e.target.files;
-    readTextFile(files[0], function(text) {
-      let readerText = text.valueOf();
-      readerText.toLowerCase();
-      let arrIP = readerText.split(" ");
-      readerText = null;
+  input.onchange = function(event) {
+    let file = event.target.files[0];
+    readTextFile(file, function(text) {
+      // 공백을 기준으로 IP 분리
+      let ipAddresses = text.split(" ");
       
-      let count;
-      let Scount = 1; // Same Count
-      arrIP.sort();
+      // Set을 사용하여 중복 제거
+      let uniqueIPs = [...new Set(ipAddresses)];
       
-      for(count = 0; count < arrIP.length; count++) {
-        document.write(arrIP[count] + "<br />");
-        if(arrIP[count] == arrIP[count + 1]) {
-          while (arrIP[count] == arrIP[count + Scount]) {
-            arrIP[count + Scount] = null;
-            Scount++;
-          }
-          arrIP[count] = null;
-          count = count + Scount - 1;
-        }
-      }
+      // HTML 문자열을 미리 생성
+      let resultHTML = uniqueIPs.filter(ip => ip).map(ip => `${ip} `).join('');
       
-      files = null;
-      count = null;
-      Scount = null;
-      arrIP = null;
+      // 한 번에 DOM에 출력
+      document.write(resultHTML);
     });
   };
-  
-  input = null;
-}
+};
