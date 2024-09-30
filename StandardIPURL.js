@@ -1,6 +1,6 @@
-function readTextFile(f, callback) {
+function readTextFile(file, callback) {
   let reader = new FileReader();
-  reader.readAsText(f);
+  reader.readAsText(file);
   reader.onload = function() {
     callback(reader.result);
   };
@@ -9,44 +9,24 @@ function readTextFile(f, callback) {
 window.onload = function() {
   let ipChanger = document.getElementById('ipChanger');
   let urlChanger = document.getElementById('urlChanger');
-  let readerIP;
-  let readerURL;
-  let arrIP;
-  let arrURL;
-  let files;
-  let i;
   
-  ipChanger.onchange = function(e) {
-    files = e.target.files;
-    readTextFile(files[0], function(text) {
-      readerIP = text.valueOf();
-      arrIP = readerIP.split(" ");
-      for (i = 0; i < arrIP.length; i++) {
-        arrIP[i] = "any,any," + arrIP[i] + ",any,any";
-        document.write(arrIP[i] + "<br />");
-      }
-    });
+  // 공통 처리 함수
+  function processFile(inputElement, prefix, suffix) {
+    inputElement.onchange = function(e) {
+      let files = e.target.files;
+      readTextFile(files[0], function(text) {
+        let arr = text.split(" ");
+        for (let i = 0; i < arr.length; i++) {
+          arr[i] = prefix + arr[i] + suffix;
+          document.write(arr[i] + "<br />"); // 개선 가능: DOM에 직접 추가하도록 변경하는 것이 좋음
+        }
+      });
+    };
   }
   
-  urlChanger.onchange = function(e) {
-    files = e.target.files;
-    readTextFile(files[0], function(text) {
-      readerURL = text.valueOf();
-      arrURL = readerURL.split(" ");
-      for (i = 0; i < arrURL.length; i++) {
-        arrURL[i] = ",>,,," + arrURL[i] + ",";
-        document.write(arrURL[i] + "<br />");
-      }
-    });
-  }
+  // IP 파일 처리
+  processFile(ipChanger, "any,any,", ",any,any");
   
-  readerIP = null;
-  ipChanger = null;
-  urlChanger = null;
-  readerIP = null;
-  readerURL = null;
-  arrIP = null;
-  arrURL = null;
-  files = null;
-  i = null;
-}
+  // URL 파일 처리
+  processFile(urlChanger, ",>,,,", ",");
+};
